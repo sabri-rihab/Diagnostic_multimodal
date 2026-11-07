@@ -1,0 +1,10 @@
+train: /kaggle/input/datasets/rihabsabri/diagnostic-multimodal-ds/Train
+val: /kaggle/working/split/val
+test: /kaggle/working/split/test
+
+nc: 4
+names:
+  - Glioma
+  - Meningioma
+  - No Tumor
+  - Pituitary

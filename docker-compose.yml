@@ -1,21 +1,5 @@
 services:
 
-  # ── Postgres (Airflow backend DB) ──────────────────────────────────────────
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - brain_net
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
-      interval: 10s
-      retries: 5
-
   # ── MLflow Tracking Server ─────────────────────────────────────────────────
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.13.0
@@ -37,12 +21,9 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.airflow
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/airflow.db
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       MLFLOW_TRACKING_URI: http://mlflow:5000
     ports:
@@ -115,6 +96,3 @@ services:
 networks:
   brain_net:
     driver: bridge
-
-volumes:
-  postgres_data:
